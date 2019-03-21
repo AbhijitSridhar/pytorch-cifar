@@ -46,11 +46,11 @@ trainloader = torch.utils.data.DataLoader(trainset, batch_size=128, shuffle=True
 testset = torchvision.datasets.CIFAR10(root='./data', train=False, download=True, transform=transform_test)
 testloader = torch.utils.data.DataLoader(testset, batch_size=100, shuffle=False, num_workers=2)
 
-classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
+classes = ('airplane', 'automobile', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
 
 # Model
 print('==> Building model..')
-# net = VGG('VGG19')
+net = VGG('VGG19')
 # net = ResNet18()
 # net = PreActResNet18()
 # net = GoogLeNet()
@@ -61,7 +61,12 @@ print('==> Building model..')
 # net = DPN92()
 # net = ShuffleNetG2()
 # net = SENet18()
-net = ShuffleNetV2(1)
+#net = ShuffleNetV2(1)
+tr_loss = []
+tr_acc = []
+te_loss = []
+te_acc = []
+
 net = net.to(device)
 if device == 'cuda':
     net = torch.nn.DataParallel(net)
@@ -83,9 +88,9 @@ optimizer = optim.SGD(net.parameters(), lr=args.lr, momentum=0.9, weight_decay=5
 def train(epoch):
     print('\nEpoch: %d' % epoch)
     net.train()
-    train_loss = 0
-    correct = 0
-    total = 0
+    global train_loss = 0
+    global correct = 0
+    global total = 0
     for batch_idx, (inputs, targets) in enumerate(trainloader):
         inputs, targets = inputs.to(device), targets.to(device)
         optimizer.zero_grad()
@@ -98,6 +103,7 @@ def train(epoch):
         _, predicted = outputs.max(1)
         total += targets.size(0)
         correct += predicted.eq(targets).sum().item()
+        
 
         progress_bar(batch_idx, len(trainloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
             % (train_loss/(batch_idx+1), 100.*correct/total, correct, total))
@@ -105,22 +111,22 @@ def train(epoch):
 def test(epoch):
     global best_acc
     net.eval()
-    test_loss = 0
-    correct = 0
-    total = 0
+    global test_loss = 0
+    global correct1 = 0
+    global total1 = 0
     with torch.no_grad():
         for batch_idx, (inputs, targets) in enumerate(testloader):
             inputs, targets = inputs.to(device), targets.to(device)
             outputs = net(inputs)
             loss = criterion(outputs, targets)
 
-            test_loss += loss.item()
+            global test_loss += loss.item()
             _, predicted = outputs.max(1)
-            total += targets.size(0)
-            correct += predicted.eq(targets).sum().item()
+            total1 += targets.size(0)
+            correct1 += predicted.eq(targets).sum().item()
 
             progress_bar(batch_idx, len(testloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
-                % (test_loss/(batch_idx+1), 100.*correct/total, correct, total))
+                % (test_loss/(batch_idx+1), 100.*correct1/total1, correct1, total1))
 
     # Save checkpoint.
     acc = 100.*correct/total
@@ -139,4 +145,13 @@ def test(epoch):
 
 for epoch in range(start_epoch, start_epoch+200):
     train(epoch)
+    tr_loss.append(train_loss)
+    tr_acc.append(100.*correct/total)
     test(epoch)
+    te_loss.append(test_loss)
+    te_acc.append(100.*correct/total)
+ 
+print('tr_loss = ',tr_loss)
+print('tr_acc = ', tr_acc)
+print('te_loss = ',te_loss)
+print('te_acc = ', te_acc)
