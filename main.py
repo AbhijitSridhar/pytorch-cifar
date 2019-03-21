@@ -88,9 +88,10 @@ optimizer = optim.SGD(net.parameters(), lr=args.lr, momentum=0.9, weight_decay=5
 def train(epoch):
     print('\nEpoch: %d' % epoch)
     net.train()
-    global train_loss = 0
-    global correct = 0
-    global total = 0
+    global train_loss, correct, total
+    train_loss = 0
+    correct = 0
+    total = 0
     for batch_idx, (inputs, targets) in enumerate(trainloader):
         inputs, targets = inputs.to(device), targets.to(device)
         optimizer.zero_grad()
@@ -111,9 +112,10 @@ def train(epoch):
 def test(epoch):
     global best_acc
     net.eval()
-    global test_loss = 0
-    global correct1 = 0
-    global total1 = 0
+    global test_loss, correct1, total1
+    test_loss = 0
+    correct1 = 0
+    total1 = 0
     with torch.no_grad():
         for batch_idx, (inputs, targets) in enumerate(testloader):
             inputs, targets = inputs.to(device), targets.to(device)
