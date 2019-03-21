@@ -122,7 +122,7 @@ def test(epoch):
             outputs = net(inputs)
             loss = criterion(outputs, targets)
 
-            global test_loss += loss.item()
+            test_loss += loss.item()
             _, predicted = outputs.max(1)
             total1 += targets.size(0)
             correct1 += predicted.eq(targets).sum().item()
