@@ -144,16 +144,16 @@ def test(epoch):
         torch.save(state, './checkpoint/ckpt.t7')
         best_acc = acc
 
-
-for epoch in range(start_epoch, start_epoch+200):
-    train(epoch)
-    tr_loss.append(train_loss)
-    tr_acc.append(100.*correct/total)
-    test(epoch)
-    te_loss.append(test_loss)
-    te_acc.append(100.*correct/total)
- 
-print('tr_loss = ',tr_loss)
-print('tr_acc = ', tr_acc)
-print('te_loss = ',te_loss)
-print('te_acc = ', te_acc)
+try:
+        for epoch in range(start_epoch, start_epoch+100):
+        train(epoch)
+        tr_loss.append(train_loss)
+        tr_acc.append(100.*correct/total)
+        test(epoch)
+        te_loss.append(test_loss)
+        te_acc.append(100.*correct/total)
+except KeyboardInterrupt: 
+    print('tr_loss = ',tr_loss)
+    print('tr_acc = ', tr_acc)
+    print('te_loss = ',te_loss)
+    print('te_acc = ', te_acc)
