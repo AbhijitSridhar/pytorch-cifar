@@ -151,7 +151,7 @@ try:
             tr_acc.append(100.*correct/total)
             test(epoch)
             te_loss.append(test_loss)
-            te_acc.append(100.*correct/total)
+            te_acc.append(100.*correct1/total1)
         print('Output')
         print('tr_loss = ',tr_loss)
         print('tr_acc = ', tr_acc)
